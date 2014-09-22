@@ -1,0 +1,52 @@
+<html>
+<style>
+table {
+	height: 100%;
+	width: 100%;
+	border: 1px solid black;
+}
+textarea, iframe {
+	width: 100%;
+	height: 100%;
+	resize: both;
+}
+</style>
+<table>
+	<tbody>
+	<th colspan="2" style="text-align: center; height: 10%;">
+		<button id="my_button" onclick="save()" style="background: #0099FF; width: 80px; height: 40px; color: #FFFFFF;">Click Meeee!</button>
+	</th>
+		<tr>
+			<td>
+				<textarea placeholder="HTML" id="html_area" onresize="resize()"></textarea>
+			</td>
+			<td>
+				<textarea placeholder="CSS" id="css_area" onresize="resize()"></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<textarea placeholder="JavaScript" id="js_area" onresize="resize()"></textarea>
+			</td>
+			<td>
+				<textarea placeholder="Click the button, I dare you." id="preview" onresize="resize()"></textarea>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<script>
+function resize() {
+}
+
+function save() {
+	var html = document.getElementById("html_area").value;
+	var css = document.getElementById("css_area").value;
+	var javascript = document.getElementById("js_area").value;
+	document.getElementById("preview").innerHTML = "<html>\n<style>\n" + css + "\n</style>\n" + javascript + "\n<body>\n" + html + "\n<script>\n" + javascript + "\n<script>\n</body>\n</html>";
+	
+	document.write("<html>\n<style>\n" + css + "\n</style>\n<head>\n" + javascript + "\n</head>\n<body>\n" + html + "\n</body>\n</html>");
+}
+</script>
+</body>
+</html>
