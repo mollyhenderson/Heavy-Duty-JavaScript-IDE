@@ -1,4 +1,4 @@
 Heavy-Duty-JavaScript-IDE
 =========================
 
-For EECS 393!
+Class project for EECS 393 at CWRU.
