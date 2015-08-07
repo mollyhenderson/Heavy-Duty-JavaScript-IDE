@@ -1,54 +1,287 @@
+
 <html>
-<style>
-table {
-	height: 100%;
-	width: 100%;
-	border: 1px solid black;
-}
-textarea, div {
-	width: 100%;
-	height: 100%;
-	resize: both;
-	border: 1px solid black;
-}
-</style>
-<table>
-	<tbody>
-	<th colspan="2" style="text-align: center; height: 10%;">
-		<button id="my_button" onclick="save()" style="background: #0099FF; width: 80px; height: 40px; color: #FFFFFF;">Click Meeee!</button>
-	</th>
-		<tr>
-			<td>
-				<textarea placeholder="HTML" id="html_area" onresize="resize()"></textarea>
-			</td>
-			<td>
-				<textarea placeholder="CSS" id="css_area" onresize="resize()"></textarea>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<textarea placeholder="JavaScript" id="js_area" onresize="resize()"></textarea>
-			</td>
-			<td>
-				<div contenteditable="true" placeholder="Click the button, I dare you." id="preview" onresize="resize()"></div>
-			</td>
-		</tr>
-	</tbody>
-</table>
-
-<script>
-function resize() {
-}
-
-function save() {
-	var html = document.getElementById("html_area").value;
-	var css = document.getElementById("css_area").value;
-	var javascript = document.getElementById("js_area").value;
-	//this is ridiculous
-	document.getElementById("preview").innerHTML = "<html>\n<style>\n" + css + "\n</style>\n<body>\n" + html + "\n<script>\n" + javascript + "\n</scr"+"ipt>\n</body>\n</html>";
+	<head>
+		<script src="http://marunowskia.com/static/compressed_form.js"></script>
+		<script>
+			mobwrite.syncGateway = "/scripts/q.py"
+			mobwrite.maxSyncInterval = 3000;
+			mobwrite.minSyncInterval = 200;
+			mobwrite.syncInterval = 1000;
+		</script>
+	</head>
+	<style>
+		html {
+			background: black;
+		}
+		.side_panel {
+			text-align: center;
+			vertical-align: top;
+			width: 5%;
+			padding: 20px;
+		}
+		h1 {
+			font-family: arial;
+			font-size: 50px;
+			font-style: italic;
+			font-weight: bold;
+			color: #00FF00;
+		}
+		table {
+			width: 100%;
+			height: 100%;
+			text-align: center;
+			vertical-align: middle;
+		}
+		.header {
+			font-family: arial;
+			font-size: 16px;
+			color: #00FF00;
+			background: black;
+			border: 2px solid blue;
+			text-align: left;
+			height: 5%;
+		}
+		.panel {
+			width: 50%;
+			height: 45%;
+		}
+		.inner_panel {
+			resize: none;
+			background: white;
+			width: 100%;
+			height: 100%;
+			-webkit-box-sizing: border-box;
+			   -moz-box-sizing: border-box;
+					box-sizing: border-box;
+			border: 1px solid black;
+		}
+		
+		button {
+			width: 150px;
+			height: 30px;
+			background: black;
+			color: #00FF00;
+			font-family: arial;
+			font-size: 16px;
+			border: 2px solid #0000FF;
+		}
+		.modal {
+			visibility: hidden;
+			background-color: rgba(0,0,0,0.5);
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			width: 100%;
+			height: 100%;
+			text-align: center;
+			z-index: 1;
+			
+		}
+		.modal_contents {
+		    width: 300px;
+			margin: 100px auto;
+			background-color: #fff;
+			border: 1px solid #000;
+			padding: 15px;
+			text-align: center;
+		}
+	</style>
 	
-	//document.write("<html>\n<style>\n" + css + "\n</style>\n<head>\n<script>" + javascript + "\n</scr" + "ipt></head>\n<body>\n" + html + "\n</body>\n</html>");
-}
-</script>
-</body>
+	<table>
+		<tbody>
+			<tr>
+				<td class="side_panel">
+					<h1>JsLive</h1>
+					<button id="login_btn" onclick="login()">Log in</button></br>
+					<div></br></div>
+					<button id="new_project_btn" onclick="new_project()">New project</button></br>
+					<div><br></div>
+					<div></br></div>
+					<button id="tag_btn" onclick="tag()">Tag</button></br>
+					<div></br></div>
+					<button id="fork_btn" onclick="fork()">Fork</button></br>
+					<div></br></div>
+					<button id="share_btn" onclick="share()">Share</button></br>
+					<div></br></div>
+					<div></br></div>
+					<button id="view_btn" onclick="view()">View in browser</button>
+				</td>
+				<td>
+					<table>
+						<tbody>
+							<tr>
+								<td class="header">
+									<p>HTML</p>
+								</td>
+								<td class="header">
+									<p>CSS</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="panel">
+									<textarea class="inner_panel" id="html" onchange="update_preview()" oninput="update_preview()"></textarea>
+								</td>
+								<td class="panel">
+									<textarea class="inner_panel" id="css" onchange="update_preview()" oninput="update_preview()"></textarea>
+								</td>
+							</tr>							
+							<tr>
+								<td class="header">
+									<p>JavaScript</p>
+								</td>
+								<td class="header">
+									<p>Preview</p>
+								</td>
+							</tr>
+							<tr>
+								<td class="panel">
+									<textarea class="inner_panel" id="javascript" oninput="update_preview()" onchange="update_preview()"></textarea>
+								</td>
+								<td class="panel">
+									<iframe class="inner_panel" id="preview" src="about:blank"></iframe>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<div class="modal" id="fork_modal">
+		<div class="modal_contents">
+		<p>Choose the project permissions for your fork:</p>
+		<button id="public_btn" onclick="create_fork('public')">Public</button><br/><br/>
+		<button id="private_btn" onclick="create_fork('private')">Private</button><br/><br/>
+		<button class="cancel" onclick="toggle_modal('fork_modal')">Cancel</button>
+		</div>
+	</div>
+	
+	<div class="modal" id="new_project_modal">
+		<div class="modal_contents">
+		<p>Choose the project permissions for your new project:</p>
+		<button id="public_btn" onclick="create_new_project('public')">Public</button><br/><br/>
+		<button id="private_btn" onclick="create_new_project('private')">Private</button><br/><br/>
+		<button class="cancel" onclick="toggle_modal('new_project_modal')">Cancel</button>
+		</div>
+	</div>
+	
+	<div class="modal" id="share_modal">
+		<div class="modal_contents">
+		<p>Choose how you would like to share this project:</p>
+		<button id="public_btn" onclick="create_share('public')">Publicly</button><br/><br/>
+		<button id="private_btn" onclick="create_share('private')">Privately</button><br/><br/>
+		<button class="cancel" onclick="toggle_modal('share_modal')">Cancel</button>
+		</div>
+	</div>
+	
+	<script>
+		function update_preview() {
+			var html = document.getElementById("html").value;
+			var css = document.getElementById("css").value;
+			var javascript = document.getElementById("javascript").value;
+			
+			contents = "<head>\n<style>\n" + css + "\n</style>\n</head><body>\n" + html + "\n<script>\n" + javascript + "\n</scr"+"ipt>\n</body>";
+				
+			var prev = document.getElementById("preview");
+			prev.contentWindow.contents = contents;
+			prev.src = 'javascript:window["contents"]';
+		}
+
+		function toggle_modal(id) {
+			el = document.getElementById(id);
+			el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+		}
+		function get_cookie() {
+			var value = "; " + document.cookie;
+			var parts = value.split("; gtoken=");
+			
+			//if parts.length != 2, there is no cookie
+			if (parts.length == 2) return parts.pop().split(";").shift();
+		}
+		
+		function cookie_is_valid() {
+			var cookie = get_cookie();
+			if(typeof cookie == 'undefined')
+				return false;
+			return true;
+		}
+				
+		function login() {
+			if(cookie_is_valid()) {
+				document.cookie = "gtoken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+				document.getElementById("login_btn").innerHTML = "Log in";
+			} else {
+				window.open("http://marunowskia.com:8000/gitkit");
+			}
+		}
+
+		function new_project() {
+			if(!cookie_is_valid()) {
+				window.open("/action/new_project/public");
+			}
+			else {
+				toggle_modal("new_project_modal"); 
+			}
+		}
+		function create_new_project(permissions) {
+			toggle_modal("new_project_modal");
+			
+			window.open("/action/new_project/" + permissions);
+		}
+		
+		function tag() {
+			var projectId = getId();
+			window.open("/action/tag?" + projectId);
+		}
+		
+		function fork() {
+			toggle_modal("fork_modal");	
+		}
+		function create_fork(permissions) {
+			toggle_modal("fork_modal");
+			
+			var projectId = getId();
+			window.open("/action/fork/" + permissions + "?" + projectId);
+		}
+		
+		function share() {
+			toggle_modal("share_modal");
+		}
+		function create_share(permissions) {
+			toggle_modal("share_modal");
+			
+			var projectId = getId();
+			window.open("/action/share/" + permissions + "?" + projectId);
+		}
+	
+		function view() {
+			var projectId = getId();
+			window.open("/action/view?" + projectId);
+		}
+		
+		function getId() {
+			return window.location.search.substring(1);
+		}		
+		
+		function share_with_mobwrite() {
+			mobwrite.minSyncInterval = 100;
+			mobwrite.syncInterval = 400;
+			mobwrite.maxSyncInterval = 700;
+			mobwrite.idPrefix = getId();
+			mobwrite.share("html");
+			mobwrite.share("css");
+			mobwrite.share("javascript");
+		}
+
+		window.setTimeout('share_with_mobwrite()', 0);
+		
+		//change button to "Log out" if already logged in
+		if(cookie_is_valid()) {
+			document.getElementById("login_btn").innerHTML = "Log out";
+		}
+	
+	</script>
+	
+	
 </html>
